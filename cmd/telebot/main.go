@@ -18,14 +18,9 @@ import (
 	"github.com/rasulov-emirlan/pukbot/pkg/logger"
 )
 
-var isConfigFromFile = false
-
 func main() {
 	l := logger.NewLogger()
-	if len(os.Args) == 2 {
-		isConfigFromFile = true
-	}
-	cfg, err := config.NewConfig(isConfigFromFile, ".env")
+	cfg, err := config.NewConfig(false)
 	if err != nil {
 		l.Infof("error occured: %v", err)
 		return
