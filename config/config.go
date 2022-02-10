@@ -5,8 +5,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"github.com/joho/godotenv"
 )
 
 const (
@@ -58,11 +56,6 @@ type (
 )
 
 func NewConfig(fromFile bool, filenames ...string) (Config, error) {
-	if fromFile {
-		if err := godotenv.Load(filenames...); err != nil {
-			return Config{}, err
-		}
-	}
 	var cfg Config
 
 	cfg.ServerPort = os.Getenv(port)
