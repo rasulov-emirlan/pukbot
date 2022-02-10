@@ -22,22 +22,22 @@ func main() {
 	l := logger.NewLogger()
 	cfg, err := config.NewConfig(false)
 	if err != nil {
-		l.Infof("error occured: %v", err)
+		l.Errorf("error occured: %v", err)
 		return
 	}
 	fileSystem, err := fs.NewFileSystem(cfg.GoogleFS)
 	if err != nil {
-		l.Infof("error occured: %v;", err)
+		l.Errorf("error occured: %v;", err)
 		return
 	}
 
 	if err = godotenv.Load(".env"); err != nil {
-		l.Infof("error occured: %v;", err)
+		l.Errorf("error occured: %v;", err)
 		return
 	}
 	pgxconn, err := db.NewDB(cfg.DatabaseURL)
 	if err != nil {
-		l.Infof("error occured: %v;", err)
+		l.Errorf("error occured: %v;", err)
 		return
 	}
 	defer pgxconn.Close(context.Background())
@@ -46,13 +46,13 @@ func main() {
 
 	bot, err := telegrambot.NewBot(cfg.BotToken, pukService)
 	if err != nil {
-		l.Infof("error occured: %v", err)
+		l.Errorf("error occured: %v", err)
 		return
 	}
 
 	srvr, err := server.NewServer(pukService, ":"+cfg.ServerPort, time.Second*15)
 	if err != nil {
-		l.Infof("error occured: %v", err)
+		l.Errorf("error occured: %v", err)
 		return
 	}
 	go func() {
@@ -61,7 +61,7 @@ func main() {
 	}()
 	go func() {
 		if err := srvr.Start(); err != nil && err != http.ErrServerClosed {
-			l.Infof("server fell due to: %v", err)
+			l.Errorf("server fell due to: %v", err)
 		}
 		defer srvr.Close()
 	}()
