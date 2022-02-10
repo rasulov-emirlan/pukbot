@@ -1,0 +1,69 @@
+consumes:
+- application/json
+definitions:
+  puk.Puk:
+    properties:
+      audioURL:
+        type: string
+      createdAt:
+        type: string
+      id:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  server.pukListResponse:
+    properties:
+      data:
+        properties:
+          puks:
+            items:
+              $ref: '#/definitions/puk.Puk'
+            type: array
+        type: object
+      pagination:
+        properties:
+          back:
+            type: string
+          next:
+            type: string
+        type: object
+    type: object
+info:
+  contact:
+    email: rasulov-emirlan@gmail.com
+    name: Rasulov Emirlan
+  description: This is THE web api of THE PUK bot.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Puk Bot Server
+  version: "1.0"
+paths:
+  /api/puks:
+    get:
+      consumes:
+      - application/json
+      description: Returns you the links for the puks we have in our database
+      parameters:
+      - description: Page number, !first page is 0 not 1
+        in: query
+        name: page
+        required: true
+        type: integer
+      - description: Size of the page you want to get, !if not passed limit will be
+          set to 10
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/server.pukListResponse'
+      summary: List puks
+      tags:
+      - puks
+swagger: "2.0"
