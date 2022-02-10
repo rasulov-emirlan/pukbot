@@ -22,7 +22,7 @@ var isConfigFromFile = false
 
 func main() {
 	l := logger.NewLogger()
-	if len(os.Args) > 1 {
+	if len(os.Args) == 2 {
 		isConfigFromFile = true
 	}
 	cfg, err := config.NewConfig(isConfigFromFile, ".env")
