@@ -8,7 +8,6 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/joho/godotenv"
 	"github.com/rasulov-emirlan/pukbot/config"
 	"github.com/rasulov-emirlan/pukbot/internal/puk"
 	"github.com/rasulov-emirlan/pukbot/internal/server"
@@ -18,9 +17,14 @@ import (
 	"github.com/rasulov-emirlan/pukbot/pkg/logger"
 )
 
+var isConfigFromFile = false
+
 func main() {
 	l := logger.NewLogger()
-	cfg, err := config.NewConfig(false)
+	if len(os.Args) > 1 {
+		isConfigFromFile = true
+	}
+	cfg, err := config.NewConfig(isConfigFromFile, ".env")
 	if err != nil {
 		l.Errorf("error occured: %v", err)
 		return
@@ -31,10 +35,6 @@ func main() {
 		return
 	}
 
-	if err = godotenv.Load(".env"); err != nil {
-		l.Errorf("error occured: %v;", err)
-		return
-	}
 	pgxconn, err := db.NewDB(cfg.DatabaseURL)
 	if err != nil {
 		l.Errorf("error occured: %v;", err)
