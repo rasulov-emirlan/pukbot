@@ -75,7 +75,7 @@ func (t *Telegrambot) PukCreate() telebot.HandlerFunc {
 
 func (t *Telegrambot) PukList(c telebot.Context) error {
 	if len(c.Args()) == 0 {
-		c.Send("i need exactly 2 arguments: page number, limit")
+		return c.Send("i need exactly 2 arguments: page number, limit")
 	}
 	page, err := strconv.Atoi(c.Args()[0])
 	if err != nil {
