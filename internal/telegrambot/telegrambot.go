@@ -47,6 +47,9 @@ func (t *Telegrambot) ConfigCommands() error {
 	t.bot.Handle("/hello", func(c tele.Context) error {
 		return c.Send("Hello!")
 	})
+	t.bot.Handle(tele.OnText, func(c tele.Context) error {
+		return nil
+	})
 	t.bot.Handle("/upload", t.PukCreate())
 	t.bot.Handle("/list", t.PukList)
 	return nil
