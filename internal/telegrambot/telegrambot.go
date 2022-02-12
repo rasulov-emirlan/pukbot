@@ -44,9 +44,7 @@ func (t *Telegrambot) Close() {
 }
 
 func (t *Telegrambot) ConfigCommands() error {
-	t.bot.Handle("/hello", func(c tele.Context) error {
-		return c.Send("Hello!")
-	})
+	t.bot.SetWebhook(&tele.Webhook{})
 	t.bot.Handle(tele.OnText, func(c tele.Context) error {
 		return nil
 	})

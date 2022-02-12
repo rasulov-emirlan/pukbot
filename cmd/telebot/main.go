@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/rasulov-emirlan/pukbot/config"
+	"github.com/rasulov-emirlan/pukbot/internal/delivery/graphql"
+	"github.com/rasulov-emirlan/pukbot/internal/delivery/http/server"
 	"github.com/rasulov-emirlan/pukbot/internal/puk"
-	"github.com/rasulov-emirlan/pukbot/internal/server"
-	"github.com/rasulov-emirlan/pukbot/internal/telegrambot"
 	"github.com/rasulov-emirlan/pukbot/pkg/db"
 	"github.com/rasulov-emirlan/pukbot/pkg/fs"
 	"github.com/rasulov-emirlan/pukbot/pkg/logger"
@@ -44,21 +44,22 @@ func main() {
 	pukRepository := puk.NewRepository(fileSystem, pgxconn)
 	pukService := puk.NewService(l, pukRepository)
 
-	bot, err := telegrambot.NewBot(cfg.BotToken, pukService)
-	if err != nil {
-		l.Errorf("error occured: %v", err)
-		return
-	}
+	// bot, err := telegrambot.NewBot(cfg.BotToken, pukService)
+	// if err != nil {
+	// 	l.Errorf("error occured: %v", err)
+	// 	return
+	// }
 
-	srvr, err := server.NewServer(pukService, ":"+cfg.ServerPort, time.Second*15)
+	gqlhandler, gqlplayground := graphql.NewHandler(pukService)
+	srvr, err := server.NewServer(pukService, ":"+cfg.ServerPort, time.Second*15, gqlhandler.ServeHTTP, gqlplayground)
 	if err != nil {
 		l.Errorf("error occured: %v", err)
 		return
 	}
-	go func() {
-		bot.Start()
-		defer bot.Close()
-	}()
+	// go func() {
+	// 	bot.Start()
+	// 	defer bot.Close()
+	// }()
 	go func() {
 		if err := srvr.Start(); err != nil && err != http.ErrServerClosed {
 			l.Errorf("server fell due to: %v", err)

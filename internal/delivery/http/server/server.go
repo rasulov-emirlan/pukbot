@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"net/http"
 	"strings"
 	"time"
 
@@ -26,14 +27,16 @@ import (
 
 // @Accept json
 type Server struct {
-	r          *echo.Echo
-	l          logger.Logger
-	pukService puk.Service
-	port       string
-	timeout    time.Duration
+	r             *echo.Echo
+	l             logger.Logger
+	pukService    puk.Service
+	port          string
+	timeout       time.Duration
+	gqlhandler    http.HandlerFunc
+	gqlplayground http.HandlerFunc
 }
 
-func NewServer(pukService puk.Service, port string, timeout time.Duration) (*Server, error) {
+func NewServer(pukService puk.Service, port string, timeout time.Duration, gqlh, gqlplay http.HandlerFunc) (*Server, error) {
 	router := echo.New()
 	if timeout > time.Second*60 {
 		return nil, errors.New("timout is too big")
@@ -41,10 +44,12 @@ func NewServer(pukService puk.Service, port string, timeout time.Duration) (*Ser
 	router.Server.ReadTimeout = timeout
 	router.Server.WriteTimeout = timeout
 	return &Server{
-		r:          router,
-		pukService: pukService,
-		port:       port,
-		timeout:    timeout,
+		r:             router,
+		pukService:    pukService,
+		port:          port,
+		timeout:       timeout,
+		gqlhandler:    gqlh,
+		gqlplayground: gqlplay,
 	}, nil
 }
 
@@ -73,6 +78,17 @@ func (s *Server) plugRoutes() {
 			return strings.Contains(c.Request().URL.Path, "swagger")
 		},
 	}))
+
+	s.r.POST("/query", func(c echo.Context) error {
+		s.gqlhandler(c.Response(), c.Request())
+		return nil
+	})
+
+	s.r.GET("/playground", func(c echo.Context) error {
+		s.gqlplayground(c.Response(), c.Request())
+		return nil
+	})
+
 	s.r.GET("/api/puks", pukList(s.pukService, s.l))
 	s.r.GET("/swagger/*", echoSwagger.WrapHandler)
 }

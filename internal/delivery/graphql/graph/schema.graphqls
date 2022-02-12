@@ -1,0 +1,12 @@
+type Puk {
+  id: ID!
+  authorID: Int!
+  chatID: Int!
+  audioURL: String!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Query {
+  puks(limit: Int = 10, page: Int = 0): [Puk!]!
+}
