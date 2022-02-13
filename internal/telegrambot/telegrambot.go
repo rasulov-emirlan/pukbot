@@ -1,8 +1,6 @@
 package telegrambot
 
 import (
-	"time"
-
 	"github.com/rasulov-emirlan/pukbot/internal/puk"
 	tele "gopkg.in/telebot.v3"
 )
@@ -15,8 +13,7 @@ type Telegrambot struct {
 
 func NewBot(botToken string, pukService puk.Service) (*Telegrambot, error) {
 	pref := tele.Settings{
-		Token:  botToken,
-		Poller: &tele.LongPoller{Timeout: 10 * time.Second},
+		Token: botToken,
 	}
 
 	bot, err := tele.NewBot(pref)
@@ -44,9 +41,8 @@ func (t *Telegrambot) Close() {
 }
 
 func (t *Telegrambot) ConfigCommands() error {
-	t.bot.SetWebhook(&tele.Webhook{})
 	t.bot.Handle(tele.OnText, func(c tele.Context) error {
-		return nil
+		return c.Send("hi")
 	})
 	t.bot.Handle("/upload", t.PukCreate())
 	t.bot.Handle("/list", t.PukList)
